@@ -2,6 +2,36 @@
 
 Behavioral Analytics.
 
+## Suggested Features
+
+Display emotions which exceed a certain predefined probability threshold.
+
+## Theoretical Considerations
+
+When considering the visualization of the analysis of a video, a functional viewpoint can be helpful:
+
+- Positive Valence is theoretically associated with goal congruence, approach behavior, and positive affect.
+- Negative Valence is theoretically associated with goal incongruence, avoidance behavior, and negative affect.
+
+- High Arousal is theoretically associated with high intensity, high energy, and high engagement.
+- Low Arousal is theoretically associated with low intensity, low energy, and low engagement.
+
+It is a plausible hypothesis that generally higher arousal should predict better outcomes for the simple reason 
+that a client which is more engaged is more likely to be receptive to the therapy.
+
+However, the correlations between arousal and engagement are more complex, for emotions like sadness which are typically
+characterized by low valence and low arousal, a higher emotion activation (e.g. more sadness) would probably be negatively
+correlated with arousal. 
+
+On a more granular level, it would make sense to seek to monitor how the conversational dynamics influence the 
+valence and arousal of the client. Specifically, does some topics lead to sudden engagement or disengagement?
+Which topics lead to response characteristics that are indicative of positive or negative valence? These questions must 
+be considered in relation to the theoretical framework of the therapy.
+
+## Tools 
+
+**https://streamlit.io/** suggested by Luis as a tool for creating dashboards.
+
 # Getting Started with Create React App
 
 Pick the right version of node:

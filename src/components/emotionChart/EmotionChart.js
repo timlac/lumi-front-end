@@ -4,16 +4,18 @@ import {
 } from 'recharts';
 
 const EmotionChart = ({ data, activeTimestamp, selectedColumns }) => {
-  const closestDataPoint = Math.floor(activeTimestamp);  // Get closest point based on timestamp
+  const closestDataPoint = Math.floor(activeTimestamp);
 
+  // Dynamically render lines based on selected columns
   const renderLines = () => {
     return selectedColumns.map((column) => (
       <Line
         key={column}
         type="monotone"
         dataKey={column}
-        stroke={getColorForColumn(column)}  // Use different colors for each line
+        stroke={getColorForColumn(column)}
         dot={false}
+        isAnimationActive={false}  // Disable animation for real-time updates
       />
     ));
   };
@@ -21,8 +23,6 @@ const EmotionChart = ({ data, activeTimestamp, selectedColumns }) => {
   return (
     <ResponsiveContainer width="100%" height={400}>
       <LineChart
-        width={500}
-        height={300}
         data={data}
         margin={{
           top: 5, right: 30, left: 20, bottom: 5,
@@ -31,13 +31,13 @@ const EmotionChart = ({ data, activeTimestamp, selectedColumns }) => {
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="Timestamp" />
         <YAxis domain={[-1, 1]} />
-        <Tooltip />
+        <Tooltip formatter={(value) => value.toFixed(2)} />
         <Legend />
         {renderLines()}
         <ReferenceLine
           x={data[closestDataPoint]?.Timestamp}
           stroke="orange"
-          label="Current Time"
+          label={{ value: "Current Time", position: "top", fill: "orange" }}
           isFront={true}
         />
       </LineChart>
@@ -45,7 +45,7 @@ const EmotionChart = ({ data, activeTimestamp, selectedColumns }) => {
   );
 };
 
-// Function to assign a different color for each column using a hash function
+// Helper function to assign distinct colors for each column
 const getColorForColumn = (column) => {
   const hash = [...column].reduce((acc, char) => acc + char.charCodeAt(0), 0);
   const colors = [
