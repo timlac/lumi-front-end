@@ -1,15 +1,22 @@
 import React, {useState, useEffect} from 'react';
+import {Col, Row, Card} from "antd";
 import EmotionChart from "./emotionChart/EmotionChart";
-import DataLoader from "./DataLoader";
 import ColumnSelector from "./ColumnSelector";
 import VideoPlayer from "./videoPlayer/VideoPlayer";
-import {smoothAndDownSampleData} from "../services/smoothing";
+import ValenceArousalHistogram from "./ValenceArousalHistogram";
+
+
+// TODO: This component remounts unnecessarily often, create a parent component to handle API calls or something
+// TODO: Maybe add a datahandling service
 
 const Video2Emotion = () => {
     const [selectedVideo, setSelectedVideo] = useState(null);
     const [data, setData] = useState([]);
     const [activeTimestamp, setActiveTimestamp] = useState(0);
-    const [selectedColumns, setSelectedColumns] = useState(["Valence"]);
+    const [selectedColumns, setSelectedColumns] = useState(["valence"]);
+    const [fileNameNoExt, setFileNameNoExt] = useState(null);
+    const [valenceArousal, setValenceArousal] = useState(null);
+
 
     // Fetch available videos from API on component mount
     useEffect(() => {
@@ -17,41 +24,43 @@ const Video2Emotion = () => {
             .then(response => response.json())
             .then(data => {
                 setSelectedVideo(data.videos[0]); // Set the first video as selected by default
+                setFileNameNoExt(data.videos[0].replace(/\.[^/.]+$/, ""));
             })
             .catch(error => console.error("Error fetching videos:", error));
     }, []);
 
     useEffect(() => {
-        if (selectedVideo) {
-            console.log(selectedVideo)
-
-            const fileNameNoExt = selectedVideo.replace(/\.[^/.]+$/, "");
-
-            console.log(fileNameNoExt)
-
+        if (fileNameNoExt) {
             fetch(`http://127.0.0.1:5000/prediction/${fileNameNoExt}`)
                 .then(response => response.json())
                 .then(jsonData => {
-                    const smoothData = smoothAndDownSampleData(jsonData, 1, 10);
-                    console.log(smoothData)
-                    setData(smoothData); // Directly set JSON data to `data`
+                    // const smoothData = smoothAndDownSampleData(jsonData, 1, 10);
+                    // console.log(smoothData)
+                    setData(jsonData); // Directly set JSON data to `data`
                 })
                 .catch(error => console.error("Error fetching prediction:", error));
         }
-    }, [selectedVideo]);
+    }, [fileNameNoExt]);
 
+    useEffect(() => {
+        if (fileNameNoExt) {
+            fetch(`http://127.0.0.1:5000/prediction/${fileNameNoExt}/valence_arousal`)
+                .then(response => response.json())
+                .then(jsonData => {
+                    setValenceArousal(jsonData);
+                })
+                .catch(error => console.error("Error fetching valence arousal:", error));
+        }
+    }, [fileNameNoExt]);
 
     // Dynamically get available columns from data excluding locked columns
     const availableColumns = data.length > 0 ? Object.keys(data[0]).filter(col =>
-        !["Timestamp", "Frame", "Face_ID", "Predicted_Emotion"].includes(col)
+        !["timestamp", "frame", "face_id", "predicted_emotion"].includes(col)
     ) : [];
 
     return (
         <div className="App">
             <center><h1><i>LUMINANCE</i></h1></center>
-
-            {/* Load and process CSV data */}
-            {/*<DataLoader path={predctionsUrl} setData={setData}/>*/}
 
             {/* Column selector for choosing properties */}
             <ColumnSelector
@@ -68,13 +77,22 @@ const Video2Emotion = () => {
                     selectedColumns={selectedColumns}
                 />
             )}
-
-            {/* Video player to sync with chart */}
-            <VideoPlayer
-                path={`http://127.0.0.1:5000/video/${selectedVideo}`}
-                data={data}
-                setActiveTimestamp={setActiveTimestamp}
-            />
+            <Row gutter={[16, 16]}>
+                <Col span={12}>
+                    <Card title="Video Player">
+                        <VideoPlayer
+                            path={`http://127.0.0.1:5000/video/${selectedVideo}`}
+                            data={data}
+                            setActiveTimestamp={setActiveTimestamp}
+                        />
+                    </Card>
+                </Col>
+                <Col span={12}>
+                    <Card title="Arousal Histogram">
+                        <ValenceArousalHistogram data={valenceArousal}/>
+                    </Card>
+                </Col>
+            </Row>
         </div>
     );
 };
