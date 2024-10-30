@@ -5,6 +5,7 @@ Behavioral Analytics.
 ## Suggested Features
 
 Display emotions which exceed a certain predefined probability threshold.
+Display Histograms for arousal and valence.
 
 ## Theoretical Considerations
 

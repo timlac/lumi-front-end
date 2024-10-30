@@ -1,5 +1,9 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+public/emotion_output_files/out
+public/videos/.sensitive_data
+
+
 # Video files
 *.mp4
 *.mov

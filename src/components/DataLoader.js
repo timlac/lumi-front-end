@@ -6,8 +6,10 @@ const DataLoader = ({ path, setData }) => {
   useEffect(() => {
     const fetchData = async () => {
       const parsedData = await loadCSV(path);
-      const smoothData = smoothAndDownSampleData(parsedData, 1, 10);
-      setData(smoothData);
+      // const smoothData = smoothAndDownSampleData(parsedData, 1, 10);
+      setData(parsedData);
+
+      console.log(parsedData)
     };
 
     fetchData();
